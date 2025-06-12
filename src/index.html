@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- <meta http-equiv="Content-Type" content="charset=utf-8" /> -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  </head>
+
+  <style>
+    div {
+      box-sizing: content-box;
+    }
+
+    label {
+      color: #000;
+    }
+  </style>
+
+  <body>
+    <script>
+      // HTML Structure
+      const appHTML = /* HTML */ `
+            <div id="app" style="font-family: Arial, sans-serif; margin: 20px; max-width: 800px; margin:0 auto;">
+              <h1 style="text-align: center; color: #e60000;">CV Maker</h1>
+              <form id="cv-form" style="display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                  <label for="name" style="font-weight: bold;">İsim:</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                  />
+                </div>
+                <div>
+                  <label for="title" style="font-weight: bold;">Ünvan/Pozisyon:</label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    required
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                  />
+                </div>
+                <div>
+                  <label for="email" style="font-weight: bold;">E-posta adresi:</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                  />
+                </div>
+
+                <div>
+                  <label for="phone" style="font-weight: bold;">Telefon Numarası:</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    maxlength="16"
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                  />
+                </div>
+
+                <div>
+                  <label for="about" style="font-weight: bold;">Hakkında:</label>
+                  <textarea id="about" name="about" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea/>
+                </div>
+
+                <!-- Education Section -->
+
+                <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                  <legend style="font-weight: bold; color: #000;">Eğitim</legend>
+
+                  <div id="education-container"></div>
+                </fieldset>
+                <button
+                  type="button"
+                  onclick="addEducation()"
+                  style="margin-top: 10px;width:max-content;  background-color: #fff; color: #e60000; padding: 10px; border: 1.25px solid  #e60000; border-radius: 5px; cursor: pointer;"
+                >
+                  + Eğitim ekle
+                </button>
+
+                <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                  <legend style="font-weight: bold; color: #000;">Deneyim</legend>
+                  <div id="experience-container"></div>
+                </fieldset>
+
+                <button
+                  type="button"
+                  onclick="addExperience()"
+                  style="margin-top: 10px; width:max-content; background-color: #fff; color: #e60000; padding: 10px; border: 1.25px solid  #e60000; border-radius: 5px; cursor: pointer;"
+                >
+                  + Deneyim ekle
+                </button>
+
+                <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                  <legend style="font-weight: bold; color: #000;">Sertifika</legend>
+                  <div id="certificate-container"></div>
+                </fieldset>
+
+                <button
+                  type="button"
+                  onclick="addCertificate()"
+                  style="margin-top: 10px;width:max-content; background-color: #fff; color: #e60000; padding: 10px; border: 1.25px solid  #e60000; border-radius: 5px; cursor: pointer;"
+                >
+                  + Sertifika ekle
+                </button>
+
+                <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                  <legend style="font-weight: bold; color: #000;">Referanslar</legend>
+                  <div id="reference-container"></div>
+                </fieldset>
+
+                <button
+                  type="button"
+                  onclick="addReference()"
+                  style="margin-top: 10px;width:max-content; background-color: #fff; color: #e60000; padding: 10px; border: 1.25px solid  #e60000; border-radius: 5px; cursor: pointer;"
+                >
+                  + Referans ekle
+                </button>
+
+                <div>
+                  <label for="pdf-design" style="font-weight: bold;">PDF Tasarımı:</label>
+                  <select id="pdf-design" name="pdf-design" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <option value="klasik">Klasik</option>
+                    <option value="modern">Modern</option>
+                    <option value="blackmodern">Siyah Modern</option>
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  id="generate-cv"
+                  style="margin-top: 40px;display:block;background-color: #fff; color: #e60000; padding: 10px 20px;  border: 1.25px solid  #e60000; border-radius: 5px; cursor: pointer;"
+                >
+                  CV oluştur
+                </button>
+
+                <button
+                    type="button"
+                    id="download-pdf"
+                    style="margin-top: 10px; background-color: rgba(230, 0, 0, 0.8); color: #fff; padding: 10px; border: none; border-radius: 5px; cursor: pointer; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;"
+                    >
+                    PDF olarak indir
+                </button>
+              </form>
+            </div>
+          `;
+      const detailsHtml = /* HTML */ `<div style="margin-top: 10px;">
+          <label style="font-weight: bold;">Konum:</label>
+          <input
+            type="text"
+            name="location"
+            required
+            maxlength="75"
+            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+          />
+        </div>
+
+        <!-- Start Date -->
+        <div style="margin-top: 10px;">
+          <label style="font-weight: bold;">Başlangıç Ayı:</label>
+          <select name="start-month" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <option value="">Ay</option>
+            <option value="Ocak">Ocak</option>
+            <option value="Şubat">Şubat</option>
+            <option value="Mart">Mart</option>
+            <option value="Nisan">Nisan</option>
+            <option value="Mayıs">Mayıs</option>
+            <option value="Haziran">Haziran</option>
+            <option value="Temmuz">Temmuz</option>
+            <option value="Ağustos">Ağustos</option>
+            <option value="Eylül">Eylül</option>
+            <option value="Ekim">Ekim</option>
+            <option value="Kasım">Kasım</option>
+            <option value="Aralık">Aralık</option>
+          </select>
+
+          <label style="font-weight: bold; margin-left: 10px;">Başlangıç Yılı:</label>
+          <select name="start-year" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></select>
+        </div>
+
+        <!-- End Date -->
+        <div style="margin-top: 10px;">
+          <label style="font-weight: bold;">Bitiş Ayı:</label>
+          <select name="end-month" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <option value="">Ay</option>
+            <option value="Ocak">Ocak</option>
+            <option value="Şubat">Şubat</option>
+            <option value="Mart">Mart</option>
+            <option value="Nisan">Nisan</option>
+            <option value="Mayıs">Mayıs</option>
+            <option value="Haziran">Haziran</option>
+            <option value="Temmuz">Temmuz</option>
+            <option value="Ağustos">Ağustos</option>
+            <option value="Eylül">Eylül</option>
+            <option value="Ekim">Ekim</option>
+            <option value="Kasım">Kasım</option>
+            <option value="Aralık">Aralık</option>
+          </select>
+
+          <label style="font-weight: bold; margin-left: 10px;">Bitiş Yılı:</label>
+          <select name="end-year" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></select>
+        </div> `;
+
+      document.body.innerHTML = appHTML;
+
+      // JavaScript Functionality
+      const form = document.getElementById("cv-form");
+      const preview = document.getElementById("template-preview");
+      const cvTemplate = document.getElementById("cv-template");
+      const downloadBtn = document.getElementById("generate-cv");
+      const pdfBtn = document.getElementById("download-pdf");
+
+      let educationCount = 0;
+      let experienceCount = 0;
+      let certificateCount = 0;
+      let referenceCount = 0;
+
+      function addEducation() {
+        educationCount++;
+        const container = document.getElementById("education-container");
+
+        const educationDiv = document.createElement("div");
+        educationDiv.id = `education-${educationCount}`;
+        educationDiv.style = " padding: 15px; position: relative;";
+
+        educationDiv.innerHTML = /* HTML */ `
+          <div>
+            <label style="font-weight: bold;">Derece:</label>
+            <input
+              type="text"
+              name="degree"
+              maxlength="100"
+              required
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          <div style="margin-top: 10px;">
+            <label style="font-weight: bold;">Okul:</label>
+            <input
+              type="text"
+              name="school"
+              maxlength="100"
+              required
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          ${detailsHtml}
+
+          <button
+            type="button"
+            onclick="removeElement('education-'+${educationCount})"
+            style="margin-top: 10px; background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;"
+          >
+            Kaldır
+          </button>
+        `;
+
+        container.appendChild(educationDiv);
+        populateYearOptions(educationDiv);
+      }
+
+      function populateYearOptions(educationDiv) {
+        const currentYear = new Date().getFullYear();
+        const startYearSelect = educationDiv.querySelector('[name="start-year"]');
+        const endYearSelect = educationDiv.querySelector('[name="end-year"]');
+
+        for (let year = currentYear; year >= 1980; year--) {
+          let optionStart = new Option(year, year);
+          let optionEnd = new Option(year, year);
+          startYearSelect.add(optionStart);
+          endYearSelect.add(optionEnd);
+        }
+      }
+
+      function addExperience() {
+        experienceCount++;
+        const container = document.getElementById("experience-container");
+
+        const experienceDiv = document.createElement("div");
+        experienceDiv.id = `experience-${experienceCount}`;
+        experienceDiv.style = " padding: 15px; position: relative;";
+
+        experienceDiv.innerHTML = /* HTML */ `
+          <div>
+            <label style="font-weight: bold;">Ünvan:</label>
+            <input
+              type="text"
+              name="jobTitle"
+              maxlength="100"
+              required
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          <div style="margin-top: 10px;">
+            <label style="font-weight: bold;">İşveren</label>
+            <input
+              type="text"
+              name="company"
+              maxlength="75"
+              required
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          ${detailsHtml}
+
+          <div style="margin-top: 10px;">
+            <label style="font-weight: bold;">Açıklama:</label>
+            <input
+              type="text"
+              name="description"
+              required
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          <button
+            type="button"
+            onclick="removeElement('experience-'+${experienceCount})"
+            style="margin-top: 10px; background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;"
+          >
+            Kaldır
+          </button>
+        `;
+
+        container.appendChild(experienceDiv);
+        populateYearOptions(experienceDiv);
+      }
+
+      function addCertificate() {
+        certificateCount++;
+        const container = document.getElementById("certificate-container");
+
+        const certificateDiv = document.createElement("div");
+        certificateDiv.id = `certificate-${certificateCount}`;
+        certificateDiv.style = " padding: 15px; position: relative;";
+
+        certificateDiv.innerHTML = /* HTML */ `
+          <div>
+            <label style="font-weight: bold;">Sertifika adı:</label>
+            <input
+              type="text"
+              name="certificateName"
+              required
+              maxlength="50"
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          <div style="margin-top: 10px;">
+            <label style="font-weight: bold;">Kurum:</label>
+            <input
+              type="text"
+              name="institution"
+              maxlength="75"
+              required
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          ${detailsHtml}
+
+          <div style="margin-top: 10px;">
+            <label style="font-weight: bold;">Açıklama:</label>
+            <input
+              type="text"
+              name="description"
+              required
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          <button
+            type="button"
+            onclick="removeElement('certificate-'+${certificateCount})"
+            style="margin-top: 10px; background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;"
+          >
+            Kaldır
+          </button>
+        `;
+
+        container.appendChild(certificateDiv);
+        populateYearOptions(certificateDiv);
+      }
+
+      function addReference() {
+        referenceCount++;
+        const container = document.getElementById("reference-container");
+
+        const referenceDiv = document.createElement("div");
+        referenceDiv.id = `reference-${referenceCount}`;
+        referenceDiv.style = " padding: 15px; position: relative;";
+
+        referenceDiv.innerHTML = /* HTML */ `
+          <div>
+            <label style="font-weight: bold;">Şirket adı:</label>
+            <input
+              type="text"
+              name="referenceCompany"
+              maxlength="100"
+              required
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          <div style="margin-top: 10px;">
+            <label style="font-weight: bold;">İletişim kişisi:</label>
+            <input
+              type="text"
+              name="referencePerson"
+              maxlength="50"
+              required
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          <div style="margin-top: 10px;">
+            <label for="phone" style="font-weight: bold;">Telefon Numarası:</label>
+            <input
+              type="tel"
+              name="referencePhone"
+              maxlength="16"
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            />
+          </div>
+
+          <div style="margin-top: 10px;">
+            <label for="email" style="font-weight: bold;">E-posta adresi:</label>
+            <input type="email" name="referenceEmail" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" />
+          </div>
+
+          <button
+            type="button"
+            onclick="removeElement('reference-'+${referenceCount})"
+            style="margin-top: 10px; background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;"
+          >
+            Kaldır
+          </button>
+        `;
+
+        container.appendChild(referenceDiv);
+      }
+
+      function removeElement(id) {
+        document.getElementById(id)?.remove();
+      }
+
+      document.getElementById("download-pdf").addEventListener("click", async () => {
+        const design = document.getElementById("pdf-design").value;
+        if (design === "modern") {
+          generateModernPDF();
+        } else if (design === "blackmodern") {
+          generateBlackModernPDF();
+        } else {
+          generateKlasikPDF();
+        }
+      });
+
+      function generateKlasikPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.addFont(".//Roboto-Regular.ttf", "Roboto", "normal");
+        doc.addFont("./Roboto-Bold.ttf", "Roboto", "bold");
+
+        doc.setFont("Roboto", "bold");
+
+        const name = document.getElementById("name").value;
+        const title = document.getElementById("title").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const about = document.getElementById("about").value;
+
+        const educationEntries = document.querySelectorAll("#education-container > div");
+        const experienceEntries = document.querySelectorAll("#experience-container > div");
+        const certificateEntries = document.querySelectorAll("#certificate-container > div");
+        const referenceEntries = document.querySelectorAll("#reference-container > div");
+
+        doc.setDrawColor("#808ea1");
+        doc.setLineWidth(10);
+        // doc.line(0, 0, 280, 20);
+        doc.line(0, 5, 210, 5); // (x1, y1, x2, y2) → Horizontal line
+
+        let y1 = 30;
+        let y2 = 30;
+
+        doc.setFontSize(24);
+        doc.setTextColor("#000");
+
+        let nameText = doc.splitTextToSize(name, 70);
+        doc.text(name.toUpperCase(), 10, y1, { maxWidth: 70 });
+        y1 += 15;
+        y1 += nameText.length * 3;
+        y2 += 15;
+        y2 += nameText.length * 3;
+
+        doc.setFontSize(14);
+        doc.setFont("Roboto", "normal");
+        doc.setTextColor("#888");
+        let titleText = doc.splitTextToSize(title, 70);
+        doc.text(title, 10, y1, { maxWidth: 70 });
+        y1 += 10;
+        y1 += titleText.length * 3;
+        y2 += 10;
+        y2 += titleText.length * 3;
+
+        doc.setFont("Roboto", "normal");
+        doc.setTextColor("#666666");
+        doc.setFontSize(12);
+
+        doc.setFont("Roboto", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor("#000");
+        doc.text("İletişim:", 10, y1);
+        doc.setDrawColor("#000");
+        doc.setLineWidth(0.5);
+        doc.line(10, y1 + 2, 80, y1 + 2);
+        y1 += 8;
+
+        doc.setFont("Roboto", "normal");
+        doc.setTextColor("#666666");
+        doc.setFontSize(12);
+
+        if (email) {
+          doc.addImage("./email.png", "PNG", 4, y1 - 4, 4, 4);
+          let emailText = doc.splitTextToSize(`E-posta adresi: ${email}`, 70);
+          doc.text(`E-posta adresi: ${email}`, 10, y1, { maxWidth: 70 });
+          y1 += 6;
+          y1 += emailText.length * 4;
+        }
+        if (phone) {
+          doc.addImage("./phone.png", "PNG", 4, y1 - 4, 4, 4);
+          doc.text(`Telefon Numarası: ${phone}`, 10, y1, { maxWidth: 70 });
+          y1 += 20;
+        }
+
+        if (about) {
+          doc.setTextColor("#000");
+          doc.setFontSize(14);
+          doc.setFont("Roboto", "bold");
+          doc.text("Hakkında:", 100, y2);
+          doc.setDrawColor("#000");
+          doc.setLineWidth(0.5);
+          doc.line(100, y2 + 2, 190, y2 + 2);
+          y2 += 7;
+
+          doc.setFont("Roboto", "normal");
+          doc.setFontSize(12);
+          let aboutText = doc.splitTextToSize(about, 100);
+          doc.text(about, 100, y2, { maxWidth: 100 });
+          y2 += 20;
+          y2 += aboutText.length * 3;
+        }
+
+        doc.setDrawColor("#808ea1");
+        doc.setLineWidth(0.5);
+        doc.line(90, 30, 90, 280);
+
+        if (educationEntries.length > 0) {
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(14);
+          doc.text("Eğitim:", 10, y1);
+          doc.setDrawColor("#000");
+          doc.setLineWidth(0.5);
+          doc.line(10, y1 + 2, 80, y1 + 2);
+          y1 += 7;
+
+          educationEntries.forEach((edu, index) => {
+            const degree = edu.querySelector('[name="degree"]').value;
+            const school = edu.querySelector('[name="school"]').value;
+            const location = edu.querySelector('[name="location"]').value;
+            const startMonth = edu.querySelector('[name="start-month"]').value;
+            const startYear = edu.querySelector('[name="start-year"]').value;
+            const endMonth = edu.querySelector('[name="end-month"]').value;
+            const endYear = edu.querySelector('[name="end-year"]').value;
+
+            doc.setFontSize(12);
+            doc.setTextColor("#000");
+            doc.setFont("Roboto", "bold");
+            let degreeText = doc.splitTextToSize(`${degree} - ${school}`, 70);
+            doc.text(degreeText, 10, y1, { maxWidth: 70 });
+            y1 += 2;
+            y1 += degreeText.length * 4;
+
+            doc.setFontSize(11);
+            doc.setTextColor("#666666");
+            doc.setFont("Roboto", "normal");
+            const details = `${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`;
+            let detsText = doc.splitTextToSize(details, 70);
+            doc.text(details, 10, y1, { maxWidth: 70 });
+            y1 += 7;
+            y1 += detsText.length * 3;
+          });
+
+          y1 += 10;
+        }
+
+        if (experienceEntries.length > 0) {
+          doc.setTextColor("#000");
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(14);
+          doc.text("Deneyim:", 100, y2);
+          doc.setDrawColor("#000");
+          doc.setLineWidth(0.5);
+          doc.line(100, y2 + 2, 190, y2 + 2);
+          y2 += 7;
+
+          experienceEntries.forEach((exp, index) => {
+            const jobTitle = exp.querySelector('[name="jobTitle"]').value;
+            const company = exp.querySelector('[name="company"]').value;
+            const location = exp.querySelector('[name="location"]').value;
+            const description = exp.querySelector('[name="description"]').value;
+            const startMonth = exp.querySelector('[name="start-month"]').value;
+            const startYear = exp.querySelector('[name="start-year"]').value;
+            const endMonth = exp.querySelector('[name="end-month"]').value;
+            const endYear = exp.querySelector('[name="end-year"]').value;
+
+            doc.setFontSize(12);
+            doc.setFont("Roboto", "bold");
+            doc.setTextColor("#000");
+            let expText = doc.splitTextToSize(`${jobTitle} - ${company}`, 100);
+            doc.text(expText, 100, y2, { maxWidth: 100 });
+            y2 += 3;
+            y2 += expText.length * 4;
+
+            doc.setFontSize(11);
+            doc.setTextColor("#666666");
+            doc.setFont("Roboto", "normal");
+            const details = `${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`;
+            let detsText = doc.splitTextToSize(details, 70);
+            doc.text(details, 100, y2, { maxWidth: 100 });
+            y2 += 3;
+            y2 += detsText.length * 3;
+
+            doc.setTextColor("#000");
+            doc.setFontSize(10);
+            let descriptionText = doc.splitTextToSize(description, 100);
+            doc.text(description, 100, y2, { maxWidth: 100 });
+            y2 += 2;
+            y2 += descriptionText.length * 4;
+          });
+
+          y2 += 10;
+        }
+
+        if (certificateEntries.length > 0) {
+          doc.setTextColor("#000");
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(14);
+          doc.text("Sertifikalar:", 10, y1);
+          doc.setDrawColor("#000");
+          doc.setLineWidth(0.5);
+          doc.line(10, y1 + 2, 80, y1 + 2);
+          y1 += 7;
+
+          certificateEntries.forEach((cert, index) => {
+            const name = cert.querySelector('[name="certificateName"]').value;
+            const institution = cert.querySelector('[name="institution"]').value;
+            const location = cert.querySelector('[name="location"]').value;
+            const description = cert.querySelector('[name="description"]').value;
+            const startMonth = cert.querySelector('[name="start-month"]').value;
+            const startYear = cert.querySelector('[name="start-year"]').value;
+            const endMonth = cert.querySelector('[name="end-month"]').value;
+            const endYear = cert.querySelector('[name="end-year"]').value;
+
+            doc.setFontSize(12);
+            doc.setFont("Roboto", "bold");
+            doc.setTextColor("#000");
+            const title = `${name} - ${institution}`;
+            let certText = doc.splitTextToSize(title, 70);
+            doc.text(certText, 10, y1, { maxWidth: 70 });
+            y1 += 3;
+            y1 += certText.length * 4;
+
+            doc.setFontSize(11);
+            doc.setTextColor("#666666");
+            doc.setFont("Roboto", "normal");
+            const details = `${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`;
+            let detailsText = doc.splitTextToSize(details, 70);
+            doc.text(details, 10, y1, { maxWidth: 70 });
+            y1 += detailsText.length * 4;
+
+            if (description) {
+              doc.setTextColor("#000");
+              doc.setFontSize(10);
+              doc.text(description, 10, y1, { maxWidth: 70 });
+            }
+            y1 += 10;
+          });
+
+          y1 += 10;
+        }
+
+        if (referenceEntries.length > 0) {
+          doc.setTextColor("#000");
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(14);
+          doc.text("Referanslar:", 10, y1);
+          doc.setDrawColor("#000");
+          doc.setLineWidth(0.5);
+          doc.line(10, y1 + 2, 80, y1 + 2);
+          y1 += 7;
+
+          referenceEntries.forEach((ref, index) => {
+            const company = ref.querySelector('[name="referenceCompany"]').value;
+            const person = ref.querySelector('[name="referencePerson"]').value;
+            const phone = ref.querySelector('[name="referencePhone"]').value;
+            const email = ref.querySelector('[name="referenceEmail"]').value;
+
+            doc.setFontSize(11);
+            doc.setTextColor("#666666");
+            doc.setFont("Roboto", "normal");
+            let refText = doc.splitTextToSize(`Şirket: ${company}`, 70);
+            doc.text(refText, 10, y1, { maxWidth: 70 });
+            y1 += 3;
+            y1 += refText.length * 3;
+
+            let personText = doc.splitTextToSize(`İletişim kişisi: ${person}`, 70);
+            doc.text(personText, 10, y1, { maxWidth: 70 });
+            y1 += 3;
+            y1 += personText.length * 3;
+
+            if (phone) {
+              doc.text(`Telefon numarası: ${phone}`, 10, y1, { maxWidth: 70 });
+              y1 += 6;
+            }
+
+            if (email) {
+              doc.text(`E-post adresi: ${phone}`, 10, y1, { maxWidth: 70 });
+              y1 += 6;
+            }
+
+            y1 += 10;
+          });
+
+          y1 += 10;
+        }
+
+        doc.save("CV.pdf");
+      }
+
+      function generateModernPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: "pt", format: "a4" });
+        doc.addFont("./Roboto-Regular.ttf", "Roboto", "normal");
+        doc.addFont("./Roboto-Bold.ttf", "Roboto", "bold");
+
+        // Get form data
+        const name = document.getElementById("name").value;
+        const title = document.getElementById("title").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const about = document.getElementById("about").value;
+        const educationEntries = document.querySelectorAll("#education-container > div");
+        const experienceEntries = document.querySelectorAll("#experience-container > div");
+        const certificateEntries = document.querySelectorAll("#certificate-container > div");
+        const referenceEntries = document.querySelectorAll("#reference-container > div");
+
+        // Layout constants
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const leftColX = 40;
+        const rightColX = 250;
+        const leftColW = 180;
+        const rightColW = 300;
+        let leftY = 180;
+        let rightY = 180;
+
+        // Draw left column background
+        doc.setFillColor(219, 219, 219); // #dbdbdb
+        doc.rect(0, 0, rightColX - 10, pageHeight, "F"); // end a few pixels before rightColX
+
+        // Top name/title box background (white fill to cover grey)
+        doc.setFillColor(255, 255, 255); // white
+        doc.rect(40, 40, pageWidth - 80, 80, "F");
+
+        // Top name/title box border and text
+        doc.setDrawColor("#222");
+        doc.setLineWidth(2);
+        doc.rect(40, 40, pageWidth - 80, 80, "S");
+        doc.setFontSize(28);
+        doc.setFont("Roboto", "bold");
+        doc.setTextColor("#222");
+        doc.text(name.toUpperCase(), pageWidth / 2, 80, { align: "center" });
+        doc.setFontSize(16);
+        doc.setFont("Roboto", "normal");
+        doc.setTextColor("#888");
+        doc.text(title, pageWidth / 2, 105, { align: "center" });
+
+        // Left column: Contact
+        doc.setFontSize(12);
+        doc.setFont("Roboto", "bold");
+        doc.setTextColor("#222");
+        doc.text("İletişim", leftColX, leftY);
+        doc.setDrawColor("#888");
+        doc.setLineWidth(2);
+        doc.line(leftColX, leftY + 4, leftColX + leftColW, leftY + 4);
+        leftY += 20;
+        doc.setFont("Roboto", "normal");
+        doc.setTextColor("#444");
+        if (phone) {
+          const phoneLines = doc.splitTextToSize(`📞 ${phone}`, leftColW);
+          doc.text(phoneLines, leftColX, leftY, { maxWidth: leftColW });
+          leftY += phoneLines.length * 14;
+        }
+        if (email) {
+          const emailLines = doc.splitTextToSize(`✉️ ${email}`, leftColW);
+          doc.text(emailLines, leftColX, leftY, { maxWidth: leftColW });
+          leftY += emailLines.length * 14;
+        }
+
+        // Left column: Education
+        if (educationEntries.length > 0) {
+          leftY += 10;
+          doc.setFont("Roboto", "bold");
+          doc.setTextColor("#222");
+          doc.text("Eğitim", leftColX, leftY);
+          doc.setDrawColor("#888");
+          doc.line(leftColX, leftY + 4, leftColX + leftColW, leftY + 4);
+          leftY += 20;
+          doc.setFont("Roboto", "normal");
+          doc.setTextColor("#444");
+          educationEntries.forEach((edu) => {
+            const degree = edu.querySelector('[name="degree"]').value;
+            const school = edu.querySelector('[name="school"]').value;
+            const location = edu.querySelector('[name="location"]').value;
+            const startMonth = edu.querySelector('[name="start-month"]').value;
+            const startYear = edu.querySelector('[name="start-year"]').value;
+            const endMonth = edu.querySelector('[name="end-month"]').value;
+            const endYear = edu.querySelector('[name="end-year"]').value;
+            doc.setFont("Roboto", "bold");
+            const degreeLines = doc.splitTextToSize(degree, leftColW);
+            doc.text(degreeLines, leftColX, leftY, { maxWidth: leftColW });
+            leftY += degreeLines.length * 14;
+            doc.setFont("Roboto", "normal");
+            const schoolLines = doc.splitTextToSize(school, leftColW);
+            doc.text(schoolLines, leftColX, leftY, { maxWidth: leftColW });
+            leftY += schoolLines.length * 12;
+            doc.setFontSize(10);
+            const locLines = doc.splitTextToSize(`${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`, leftColW);
+            doc.text(locLines, leftColX, leftY, { maxWidth: leftColW });
+            leftY += locLines.length * 12;
+            doc.setFontSize(12);
+          });
+        }
+
+        // Left column: Certificates
+        if (certificateEntries.length > 0) {
+          leftY += 10;
+          doc.setFont("Roboto", "bold");
+          doc.setTextColor("#222");
+          doc.text("Sertifikalar", leftColX, leftY);
+          doc.setDrawColor("#888");
+          doc.line(leftColX, leftY + 4, leftColX + leftColW, leftY + 4);
+          leftY += 20;
+          doc.setFont("Roboto", "normal");
+          doc.setTextColor("#444");
+          certificateEntries.forEach((cert) => {
+            const name = cert.querySelector('[name="certificateName"]').value;
+            const institution = cert.querySelector('[name="institution"]').value;
+            doc.setFont("Roboto", "bold");
+            const certNameLines = doc.splitTextToSize(name, leftColW);
+            doc.text(certNameLines, leftColX, leftY, { maxWidth: leftColW });
+            leftY += certNameLines.length * 14;
+            doc.setFont("Roboto", "normal");
+            const instLines = doc.splitTextToSize(institution, leftColW);
+            doc.text(instLines, leftColX, leftY, { maxWidth: leftColW });
+            leftY += instLines.length * 12;
+          });
+        }
+
+        // Left column: References
+        if (referenceEntries.length > 0) {
+          leftY += 10;
+          doc.setFont("Roboto", "bold");
+          doc.setTextColor("#222");
+          doc.text("Referanslar", leftColX, leftY);
+          doc.setDrawColor("#888");
+          doc.line(leftColX, leftY + 4, leftColX + leftColW, leftY + 4);
+          leftY += 20;
+          doc.setFont("Roboto", "normal");
+          doc.setTextColor("#444");
+          referenceEntries.forEach((ref) => {
+            const company = ref.querySelector('[name="referenceCompany"]').value;
+            const person = ref.querySelector('[name="referencePerson"]').value;
+            const phone = ref.querySelector('[name="referencePhone"]').value;
+            const email = ref.querySelector('[name="referenceEmail"]').value;
+            const companyLines = doc.splitTextToSize(`${company} (${person})`, leftColW);
+            doc.text(companyLines, leftColX, leftY, { maxWidth: leftColW });
+            leftY += companyLines.length * 14;
+            if (phone) {
+              const refPhoneLines = doc.splitTextToSize(`📞 ${phone}`, leftColW);
+              doc.text(refPhoneLines, leftColX, leftY, { maxWidth: leftColW });
+              leftY += refPhoneLines.length * 12;
+            }
+            if (email) {
+              const refEmailLines = doc.splitTextToSize(`✉️ ${email}`, leftColW);
+              doc.text(refEmailLines, leftColX, leftY, { maxWidth: leftColW });
+              leftY += refEmailLines.length * 12;
+            }
+            leftY += 4;
+          });
+        }
+
+        // Right column: Summary
+        doc.setFont("Roboto", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor("#222");
+        doc.text("Hakkında", rightColX, rightY);
+        doc.setDrawColor("#888");
+        doc.setLineWidth(2);
+        doc.line(rightColX, rightY + 4, rightColX + rightColW, rightY + 4);
+        rightY += 20;
+        doc.setFont("Roboto", "normal");
+        doc.setFontSize(12);
+        doc.setTextColor("#444");
+        if (about) {
+          let aboutText = doc.splitTextToSize(about, rightColW);
+          doc.text(aboutText, rightColX, rightY, { maxWidth: rightColW });
+          rightY += aboutText.length * 14 + 10;
+        }
+
+        // Right column: Experience
+        if (experienceEntries.length > 0) {
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(14);
+          doc.setTextColor("#222");
+          doc.text("Deneyim", rightColX, rightY);
+          doc.setDrawColor("#888");
+          doc.line(rightColX, rightY + 4, rightColX + rightColW, rightY + 4);
+          rightY += 20;
+          experienceEntries.forEach((exp, idx) => {
+            if (rightY > pageHeight - 100) {
+              doc.addPage();
+              rightY = 80;
+              // Redraw section title after page break
+              doc.setFillColor(0, 0, 0);
+              doc.rect(rightColX, rightY, pageWidth - rightColX - 40, 28, "F");
+              doc.setFont("Roboto", "bold");
+              doc.setFontSize(14);
+              doc.setTextColor(255, 255, 255);
+              doc.text("DENEYİM", rightColX + 20, rightY + 19);
+              rightY += 48;
+              doc.setFont("Roboto", "bold");
+              doc.setFontSize(12);
+              doc.setTextColor(0, 0, 0);
+            }
+            const jobTitle = exp.querySelector('[name="jobTitle"]').value;
+            const company = exp.querySelector('[name="company"]').value;
+            const location = exp.querySelector('[name="location"]').value;
+            const description = exp.querySelector('[name="description"]').value;
+            const startMonth = exp.querySelector('[name="start-month"]').value;
+            const startYear = exp.querySelector('[name="start-year"]').value;
+            const endMonth = exp.querySelector('[name="end-month"]').value;
+            const endYear = exp.querySelector('[name="end-year"]').value;
+            doc.setFont("Roboto", "bold");
+            doc.text(jobTitle, rightColX + 20, rightY);
+            rightY += 16;
+            doc.setFont("Roboto", "normal");
+            doc.text(company, rightColX + 20, rightY);
+            rightY += 14;
+            doc.setFont("Roboto", "normal");
+            doc.setFontSize(11);
+            doc.text(`${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`, rightColX + 20, rightY);
+            rightY += 14;
+            doc.setFontSize(12);
+            let descText = doc.splitTextToSize(description, pageWidth - rightColX - 60);
+            doc.text(descText, rightColX + 20, rightY, { maxWidth: pageWidth - rightColX - 60 });
+            rightY += descText.length * 12 + 8;
+          });
+          rightY += 10;
+        }
+
+        doc.save("CV.pdf");
+      }
+
+      function generateBlackModernPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: "pt", format: "a4" });
+        doc.addFont("./Roboto-Regular.ttf", "Roboto", "normal");
+        doc.addFont("./Roboto-Bold.ttf", "Roboto", "bold");
+
+        // Get form data
+        const name = document.getElementById("name").value;
+        const title = document.getElementById("title").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const about = document.getElementById("about").value;
+        const educationEntries = document.querySelectorAll("#education-container > div");
+        const experienceEntries = document.querySelectorAll("#experience-container > div");
+        const certificateEntries = document.querySelectorAll("#certificate-container > div");
+        const referenceEntries = document.querySelectorAll("#reference-container > div");
+
+        // Layout constants
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const leftColW = 220;
+        const rightColX = leftColW + 30;
+        let leftY = 80;
+        let rightY = 80;
+
+        // Section: Contact
+        doc.setFillColor(0, 0, 0);
+        doc.rect(20, leftY, leftColW - 40, 28, "F");
+        doc.setFont("Roboto", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(255, 255, 255);
+        doc.text("İLETİŞİM", leftColW / 2, leftY + 19, { align: "center" });
+        leftY += 48;
+        doc.setFont("Roboto", "normal");
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        if (phone) {
+          let phoneLines = doc.splitTextToSize("☎ " + phone, leftColW - 60);
+          doc.text(phoneLines, 40, leftY, { maxWidth: leftColW - 60 });
+          leftY += phoneLines.length * 14;
+        }
+        if (email) {
+          let emailLines = doc.splitTextToSize("✉ " + email, leftColW - 60);
+          doc.text(emailLines, 40, leftY, { maxWidth: leftColW - 60 });
+          leftY += emailLines.length * 14;
+        }
+        leftY += 10;
+
+        // Section: Education
+        if (educationEntries.length > 0) {
+          doc.setFillColor(0, 0, 0);
+          doc.rect(20, leftY, leftColW - 40, 28, "F");
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(14);
+          doc.setTextColor(255, 255, 255);
+          doc.text("EĞİTİM", leftColW / 2, leftY + 19, { align: "center" });
+          leftY += 48;
+          doc.setFont("Roboto", "normal");
+          doc.setFontSize(12);
+          doc.setTextColor(0, 0, 0);
+          educationEntries.forEach((edu) => {
+            const degree = edu.querySelector('[name="degree"]').value;
+            const school = edu.querySelector('[name="school"]').value;
+            const location = edu.querySelector('[name="location"]').value;
+            const startMonth = edu.querySelector('[name="start-month"]').value;
+            const startYear = edu.querySelector('[name="start-year"]').value;
+            const endMonth = edu.querySelector('[name="end-month"]').value;
+            const endYear = edu.querySelector('[name="end-year"]').value;
+            doc.setFont("Roboto", "bold");
+            let degreeLines = doc.splitTextToSize(`${degree} - ${school}`, leftColW - 60);
+            doc.text(degreeLines, 40, leftY, { maxWidth: leftColW - 60 });
+            leftY += degreeLines.length * 14;
+            doc.setFont("Roboto", "normal");
+            doc.setFontSize(11);
+            let locLines = doc.splitTextToSize(`${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`, leftColW - 60);
+            doc.text(locLines, 40, leftY, { maxWidth: leftColW - 60 });
+            leftY += locLines.length * 12;
+            doc.setFontSize(12);
+          });
+          leftY += 10;
+        }
+
+        // Section: Certificates
+        if (certificateEntries.length > 0) {
+          doc.setFillColor(0, 0, 0);
+          doc.rect(20, leftY, leftColW - 40, 28, "F");
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(14);
+          doc.setTextColor(255, 255, 255);
+          doc.text("SERTİFİKALAR", leftColW / 2, leftY + 19, { align: "center" });
+          leftY += 48;
+          doc.setFont("Roboto", "normal");
+          doc.setFontSize(12);
+          doc.setTextColor(0, 0, 0);
+          certificateEntries.forEach((cert) => {
+            const name = cert.querySelector('[name="certificateName"]').value;
+            const institution = cert.querySelector('[name="institution"]').value;
+            const location = cert.querySelector('[name="location"]').value;
+            const description = cert.querySelector('[name="description"]').value;
+            const startMonth = cert.querySelector('[name="start-month"]').value;
+            const startYear = cert.querySelector('[name="start-year"]').value;
+            const endMonth = cert.querySelector('[name="end-month"]').value;
+            const endYear = cert.querySelector('[name="end-year"]').value;
+            doc.setFont("Roboto", "bold");
+            let certLines = doc.splitTextToSize(`${name} - ${institution}`, leftColW - 60);
+            doc.text(certLines, 40, leftY, { maxWidth: leftColW - 60 });
+            leftY += certLines.length * 14;
+            doc.setFont("Roboto", "normal");
+            doc.setFontSize(11);
+            let locLines = doc.splitTextToSize(`${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`, leftColW - 60);
+            doc.text(locLines, 40, leftY, { maxWidth: leftColW - 60 });
+            leftY += locLines.length * 12;
+            if (description) {
+              doc.setFontSize(10);
+              let descLines = doc.splitTextToSize(description, leftColW - 60);
+              doc.text(descLines, 40, leftY, { maxWidth: leftColW - 60 });
+              leftY += descLines.length * 12;
+              doc.setFontSize(12);
+            }
+          });
+          leftY += 10;
+        }
+
+        // Section: References
+        if (referenceEntries.length > 0) {
+          doc.setFillColor(0, 0, 0);
+          doc.rect(20, leftY, leftColW - 40, 28, "F");
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(14);
+          doc.setTextColor(255, 255, 255);
+          doc.text("REFERANSLAR", leftColW / 2, leftY + 19, { align: "center" });
+          leftY += 48;
+          doc.setFont("Roboto", "normal");
+          doc.setFontSize(12);
+          doc.setTextColor(0, 0, 0);
+          referenceEntries.forEach((ref) => {
+            const company = ref.querySelector('[name="referenceCompany"]').value;
+            const person = ref.querySelector('[name="referencePerson"]').value;
+            const phone = ref.querySelector('[name="referencePhone"]').value;
+            const email = ref.querySelector('[name="referenceEmail"]').value;
+            doc.setFont("Roboto", "bold");
+            let companyLines = doc.splitTextToSize(`${company} (${person})`, leftColW - 60);
+            doc.text(companyLines, 40, leftY, { maxWidth: leftColW - 60 });
+            leftY += companyLines.length * 14;
+            doc.setFont("Roboto", "normal");
+            doc.setFontSize(11);
+            if (phone) {
+              let phoneLines = doc.splitTextToSize(`☎ ${phone}`, leftColW - 60);
+              doc.text(phoneLines, 40, leftY, { maxWidth: leftColW - 60 });
+              leftY += phoneLines.length * 12;
+            }
+            if (email) {
+              let emailLines = doc.splitTextToSize(`✉ ${email}`, leftColW - 60);
+              doc.text(emailLines, 40, leftY, { maxWidth: leftColW - 60 });
+              leftY += emailLines.length * 12;
+            }
+            doc.setFontSize(12);
+          });
+          leftY += 10;
+        }
+
+        // Right column: Name and Title
+        doc.setFont("Roboto", "bold");
+        doc.setFontSize(44);
+        doc.setTextColor(0, 0, 0);
+        let nameLines = doc.splitTextToSize(name.toUpperCase(), pageWidth - rightColX - 40);
+        doc.text(nameLines, rightColX, 110, { maxWidth: pageWidth - rightColX - 40 });
+        let nameBlockHeight = nameLines.length * 44;
+        let titleY = 110 + nameBlockHeight + 10;
+        doc.setFont("Roboto", "normal");
+        doc.setFontSize(20);
+        let titleLines = doc.splitTextToSize(title, pageWidth - rightColX - 40);
+        doc.text(titleLines, rightColX, titleY, { maxWidth: pageWidth - rightColX - 40 });
+        let titleBlockHeight = titleLines.length * 24;
+        rightY = titleY + titleBlockHeight + 30;
+
+        // Section: About
+        if (about) {
+          doc.setFillColor(0, 0, 0);
+          doc.rect(rightColX, rightY, pageWidth - rightColX - 40, 28, "F");
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(14);
+          doc.setTextColor(255, 255, 255);
+          doc.text("HAKKINDA", rightColX + 20, rightY + 19);
+          rightY += 48;
+          doc.setFont("Roboto", "normal");
+          doc.setFontSize(12);
+          doc.setTextColor(0, 0, 0);
+          let aboutText = doc.splitTextToSize(about, pageWidth - rightColX - 60);
+          doc.text(aboutText, rightColX + 20, rightY, { maxWidth: pageWidth - rightColX - 60 });
+          rightY += aboutText.length * 14 + 10;
+        }
+
+        // Section: Work Experience
+        if (experienceEntries.length > 0) {
+          doc.setFillColor(0, 0, 0);
+          doc.rect(rightColX, rightY, pageWidth - rightColX - 40, 28, "F");
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(14);
+          doc.setTextColor(255, 255, 255);
+          doc.text("DENEYİM", rightColX + 20, rightY + 19);
+          rightY += 48;
+          doc.setFont("Roboto", "bold");
+          doc.setFontSize(12);
+          doc.setTextColor(0, 0, 0);
+          experienceEntries.forEach((exp, idx) => {
+            if (rightY > pageHeight - 100) {
+              doc.addPage();
+              rightY = 80;
+              // Redraw section title after page break
+              doc.setFillColor(0, 0, 0);
+              doc.rect(rightColX, rightY, pageWidth - rightColX - 40, 28, "F");
+              doc.setFont("Roboto", "bold");
+              doc.setFontSize(14);
+              doc.setTextColor(255, 255, 255);
+              doc.text("DENEYİM", rightColX + 20, rightY + 19);
+              rightY += 48;
+              doc.setFont("Roboto", "bold");
+              doc.setFontSize(12);
+              doc.setTextColor(0, 0, 0);
+            }
+            const jobTitle = exp.querySelector('[name="jobTitle"]').value;
+            const company = exp.querySelector('[name="company"]').value;
+            const location = exp.querySelector('[name="location"]').value;
+            const description = exp.querySelector('[name="description"]').value;
+            const startMonth = exp.querySelector('[name="start-month"]').value;
+            const startYear = exp.querySelector('[name="start-year"]').value;
+            const endMonth = exp.querySelector('[name="end-month"]').value;
+            const endYear = exp.querySelector('[name="end-year"]').value;
+            doc.setFont("Roboto", "bold");
+            doc.text(jobTitle, rightColX + 20, rightY);
+            rightY += 16;
+            doc.setFont("Roboto", "normal");
+            doc.text(company, rightColX + 20, rightY);
+            rightY += 14;
+            doc.setFont("Roboto", "normal");
+            doc.setFontSize(11);
+            doc.text(`${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`, rightColX + 20, rightY);
+            rightY += 14;
+            doc.setFontSize(12);
+            let descText = doc.splitTextToSize(description, pageWidth - rightColX - 60);
+            doc.text(descText, rightColX + 20, rightY, { maxWidth: pageWidth - rightColX - 60 });
+            rightY += descText.length * 12 + 8;
+          });
+          rightY += 10;
+        }
+
+        doc.save("CV.pdf");
+      }
+
+      // Event Listener to Download CV as Word
+      downloadBtn.addEventListener("click", async () => {
+        const { Document, Packer, Paragraph, TextRun, AlignmentType, Table, TableRow, TableCell, WidthType, BorderStyle } = window.docx;
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const about = document.getElementById("about").value;
+
+        const educationEntries = document.querySelectorAll("#education-container > div");
+        const experienceEntries = document.querySelectorAll("#experience-container > div");
+        const certificateEntries = document.querySelectorAll("#certificate-container > div");
+        const referenceEntries = document.querySelectorAll("#reference-container > div");
+
+        const sections = [
+          {
+            children: [
+              new Paragraph({
+                alignment: "center",
+                spacing: { after: 300 },
+                children: [new TextRun({ text: name, bold: true, size: 36 })]
+              })
+              //   new Paragraph({
+              //     alignment: "center",
+              //     spacing: { after: 100 },
+              //     children: [new TextRun({ text: `E-posta adresi: ${email}`, size: 24, color: "666666" })]
+              //   })
+            ]
+          }
+        ];
+
+        const contactInfo = new Paragraph({
+          spacing: { after: 100 },
+          children: [
+            new TextRun({ text: "📧 " + document.getElementById("email").value, size: 24 }),
+            new TextRun({ text: "     📞 " + document.getElementById("phone").value, size: 24 })
+          ]
+        });
+
+        sections[0].children.push(contactInfo);
+
+        const leftColumn = [];
+        const rightColumn = [];
+
+        if (about) {
+          rightColumn.push(
+            new Paragraph({
+              spacing: { before: 600, after: 100 },
+              children: [new TextRun({ text: "Hakkında", bold: true, size: 28, underline: true })]
+            }),
+            new Paragraph({
+              spacing: { after: 200 },
+              children: [new TextRun({ text: about, bold: false, size: 24, underline: false })]
+            })
+          );
+        }
+
+        // Education Section
+        if (educationEntries.length > 0) {
+          leftColumn.push(
+            new Paragraph({
+              spacing: { before: 600, after: 100 },
+              children: [new TextRun({ text: "Eğitim", bold: true, size: 28, underline: true, alignment: AlignmentType.RIGHT })]
+            })
+          );
+
+          educationEntries.forEach((edu) => {
+            const degree = edu.querySelector('[name="degree"]').value;
+            const school = edu.querySelector('[name="school"]').value;
+            const location = edu.querySelector('[name="location"]').value;
+            const startMonth = edu.querySelector('[name="start-month"]').value;
+            const startYear = edu.querySelector('[name="start-year"]').value;
+            const endMonth = edu.querySelector('[name="end-month"]').value;
+            const endYear = edu.querySelector('[name="end-year"]').value;
+
+            leftColumn.push(
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [new TextRun({ text: `${degree} - ${school}`, bold: true, size: 24 })]
+              }),
+              new Paragraph({
+                spacing: { after: 300 },
+                children: [
+                  new TextRun({ text: `${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`, size: 22, color: "666666" })
+                ]
+              })
+            );
+          });
+        }
+
+        // Experience Section
+        if (experienceEntries.length > 0) {
+          rightColumn.push(
+            new Paragraph({
+              spacing: { before: 600, after: 100 },
+              children: [new TextRun({ text: "Deneyim", bold: true, size: 28, underline: true, alignment: AlignmentType.RIGHT })]
+            })
+          );
+
+          experienceEntries.forEach((exp) => {
+            const jobTitle = exp.querySelector('[name="jobTitle"]').value;
+            const company = exp.querySelector('[name="company"]').value;
+            const location = exp.querySelector('[name="location"]').value;
+            const description = exp.querySelector('[name="description"]').value;
+            const startMonth = exp.querySelector('[name="start-month"]').value;
+            const startYear = exp.querySelector('[name="start-year"]').value;
+            const endMonth = exp.querySelector('[name="end-month"]').value;
+            const endYear = exp.querySelector('[name="end-year"]').value;
+
+            rightColumn.push(
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [new TextRun({ text: `${jobTitle} - ${company}`, bold: true, size: 24 })]
+              }),
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [
+                  new TextRun({ text: `${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`, size: 22, color: "666666" })
+                ]
+              })
+            );
+
+            if (description) {
+              rightColumn.push(
+                new Paragraph({
+                  spacing: { after: 200 },
+                  children: [new TextRun({ text: description, bold: false, size: 20, underline: false })]
+                })
+              );
+            }
+          });
+        }
+
+        // Certificates Section
+        if (certificateEntries.length > 0) {
+          leftColumn.push(
+            new Paragraph({
+              spacing: { before: 600, after: 100 },
+              children: [new TextRun({ text: "Sertifikalar", bold: true, size: 28, underline: true })]
+            })
+          );
+
+          certificateEntries.forEach((cert) => {
+            const name = cert.querySelector('[name="certificateName"]').value;
+            const institution = cert.querySelector('[name="institution"]').value;
+            const location = cert.querySelector('[name="location"]').value;
+            const description = cert.querySelector('[name="description"]').value;
+            const startMonth = cert.querySelector('[name="start-month"]').value;
+            const startYear = cert.querySelector('[name="start-year"]').value;
+            const endMonth = cert.querySelector('[name="end-month"]').value;
+            const endYear = cert.querySelector('[name="end-year"]').value;
+
+            leftColumn.push(
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [new TextRun({ text: `${name} - ${institution}`, bold: true, size: 24 })]
+              }),
+              new Paragraph({
+                spacing: { after: 200 },
+                children: [
+                  new TextRun({ text: `${location} | ${startMonth} ${startYear} - ${endMonth} ${endYear}`, size: 22, color: "666666" })
+                ]
+              })
+            );
+
+            if (description) {
+              leftColumn.push(
+                new Paragraph({
+                  spacing: { after: 200 },
+                  children: [new TextRun({ text: description, bold: false, size: 20, underline: false })]
+                })
+              );
+            }
+          });
+        }
+
+        // References Section
+        if (referenceEntries.length > 0) {
+          leftColumn.push(
+            new Paragraph({
+              spacing: { before: 600, after: 100 },
+              children: [new TextRun({ text: "Referanslar", bold: true, size: 28, underline: true })]
+            })
+          );
+
+          referenceEntries.forEach((ref) => {
+            const company = ref.querySelector('[name="referenceCompany"]').value;
+            const person = ref.querySelector('[name="referencePerson"]').value;
+            const phone = ref.querySelector('[name="referencePhone"]').value;
+            const email = ref.querySelector('[name="referenceEmail"]').value;
+
+            leftColumn.push(
+              new Paragraph({
+                spacing: { after: 100 },
+                children: [new TextRun({ text: `Şirket: ${company} `, size: 22, color: "666666" })]
+              }),
+              new Paragraph({
+                spacing: { after: 100 },
+                children: [new TextRun({ text: `İletişim kişisi: ${person} `, size: 22, color: "666666" })]
+              })
+            );
+
+            if (phone) {
+              leftColumn.push(
+                new Paragraph({
+                  spacing: { after: 100 },
+                  children: [new TextRun({ text: `Telefon numarası: ${phone} `, size: 22, color: "666666" })]
+                })
+              );
+            }
+
+            if (email) {
+              leftColumn.push(
+                new Paragraph({
+                  spacing: { after: 100 },
+                  children: [new TextRun({ text: `E-posta adresi : ${phone} `, size: 22, color: "666666" })]
+                })
+              );
+            }
+          });
+        }
+
+        const twoColumnTable = new Table({
+          columnWidths: [4300, 400, 4300],
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  width: { size: 47.5, type: WidthType.PERCENTAGE },
+                  children: leftColumn,
+                  borders: {
+                    top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                    bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                    left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                    right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }
+                  }
+                }),
+                new TableCell({
+                  width: { size: 5, type: WidthType.PERCENTAGE },
+                  children: [],
+                  borders: {
+                    top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                    bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                    left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                    right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }
+                  }
+                }),
+                new TableCell({
+                  width: { size: 47.5, type: WidthType.PERCENTAGE },
+                  children: rightColumn,
+                  borders: {
+                    top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                    bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                    left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                    right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }
+                  }
+                })
+              ]
+            })
+          ]
+        });
+
+        sections[0].children.push(twoColumnTable);
+
+        const doc = new Document({ sections });
+
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, "CV.docx");
+      });
+    </script>
+  </body>
+</html>
