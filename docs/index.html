@@ -17,6 +17,18 @@
     label {
       color: #000;
     }
+
+    select {
+      background: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0Ljk1IDEwIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2ZmZjt9LmNscy0ye2ZpbGw6IzQ0NDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPmFycm93czwvdGl0bGU+PHJlY3QgY2xhc3M9ImNscy0xIiB3aWR0aD0iNC45NSIgaGVpZ2h0PSIxMCIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMiIgcG9pbnRzPSIxLjQxIDQuNjcgMi40OCAzLjE4IDMuNTQgNC42NyAxLjQxIDQuNjciLz48cG9seWdvbiBjbGFzcz0iY2xzLTIiIHBvaW50cz0iMy41NCA1LjMzIDIuNDggNi44MiAxLjQxIDUuMzMgMy41NCA1LjMzIi8+PC9zdmc+)
+        no-repeat 95% 50%;
+      -moz-appearance: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    textarea {
+      resize: vertical;
+    }
   </style>
 
   <body>
@@ -27,7 +39,7 @@
               <h1 style="text-align: center; color: #e60000;">CV Maker</h1>
               <form id="cv-form" style="display: flex; flex-direction: column; gap: 15px;">
                 <div>
-                  <label for="name" style="font-weight: bold;">İsim:</label>
+                  <label for="name" style="font-weight: bold;">İsim</label>
                   <input
                     type="text"
                     id="name"
@@ -37,7 +49,7 @@
                   />
                 </div>
                 <div>
-                  <label for="title" style="font-weight: bold;">Ünvan/Pozisyon:</label>
+                  <label for="title" style="font-weight: bold;">Ünvan/Pozisyon</label>
                   <input
                     type="text"
                     id="title"
@@ -47,7 +59,7 @@
                   />
                 </div>
                 <div>
-                  <label for="email" style="font-weight: bold;">E-posta adresi:</label>
+                  <label for="email" style="font-weight: bold;">E-posta adresi</label>
                   <input
                     type="email"
                     id="email"
@@ -58,7 +70,7 @@
                 </div>
 
                 <div>
-                  <label for="phone" style="font-weight: bold;">Telefon Numarası:</label>
+                  <label for="phone" style="font-weight: bold;">Telefon Numarası</label>
                   <input
                     type="tel"
                     id="phone"
@@ -69,13 +81,13 @@
                 </div>
 
                 <div>
-                  <label for="about" style="font-weight: bold;">Hakkında:</label>
-                  <textarea id="about" name="about" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea/>
+                  <label for="about" style="font-weight: bold;">Hakkında</label>
+                  <textarea id="about" name="about" style="width: 100%; max-width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea/>
                 </div>
 
                 <!-- Education Section -->
 
-                <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                <fieldset style="border: 1px solid #e0e0e0; background: #fafbfc; padding: 15px; border-radius: 10px; margin-top: 20px;">
                   <legend style="font-weight: bold; color: #000;">Eğitim</legend>
 
                   <div id="education-container"></div>
@@ -88,7 +100,7 @@
                   + Eğitim ekle
                 </button>
 
-                <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                <fieldset style="border: 1px solid #e0e0e0; background: #fafbfc; padding: 15px; border-radius: 10px; margin-top: 20px;">
                   <legend style="font-weight: bold; color: #000;">Deneyim</legend>
                   <div id="experience-container"></div>
                 </fieldset>
@@ -101,7 +113,7 @@
                   + Deneyim ekle
                 </button>
 
-                <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                <fieldset style="border: 1px solid #e0e0e0; background: #fafbfc; padding: 15px; border-radius: 10px; margin-top: 20px;">
                   <legend style="font-weight: bold; color: #000;">Sertifika</legend>
                   <div id="certificate-container"></div>
                 </fieldset>
@@ -114,7 +126,7 @@
                   + Sertifika ekle
                 </button>
 
-                <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                <fieldset style="border: 1px solid #e0e0e0; background: #fafbfc; padding: 15px; border-radius: 10px; margin-top: 20px;">
                   <legend style="font-weight: bold; color: #000;">Referanslar</legend>
                   <div id="reference-container"></div>
                 </fieldset>
@@ -128,7 +140,7 @@
                 </button>
 
                 <div>
-                  <label for="pdf-design" style="font-weight: bold;">PDF Tasarımı:</label>
+                  <label for="pdf-design" style="font-weight: bold;">PDF Tasarımı</label>
                   <select id="pdf-design" name="pdf-design" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
                     <option value="klasik">Klasik</option>
                     <option value="modern">Modern</option>
@@ -155,7 +167,7 @@
             </div>
           `;
       const detailsHtml = /* HTML */ `<div style="margin-top: 10px;">
-          <label style="font-weight: bold;">Konum:</label>
+          <label style="font-weight: 500; font-size:0.9em;">Konum</label>
           <input
             type="text"
             name="location"
@@ -166,49 +178,51 @@
         </div>
 
         <!-- Start Date -->
-        <div style="margin-top: 10px;">
-          <label style="font-weight: bold;">Başlangıç Ayı:</label>
-          <select name="start-month" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-            <option value="">Ay</option>
-            <option value="Ocak">Ocak</option>
-            <option value="Şubat">Şubat</option>
-            <option value="Mart">Mart</option>
-            <option value="Nisan">Nisan</option>
-            <option value="Mayıs">Mayıs</option>
-            <option value="Haziran">Haziran</option>
-            <option value="Temmuz">Temmuz</option>
-            <option value="Ağustos">Ağustos</option>
-            <option value="Eylül">Eylül</option>
-            <option value="Ekim">Ekim</option>
-            <option value="Kasım">Kasım</option>
-            <option value="Aralık">Aralık</option>
-          </select>
+        <div style="margin-top: 10px; ">
+          <label style="font-weight: 500; font-size:0.9em; margin-bottom: 10px;">Başlangıç Tarihi</label>
+          <div style="display: grid;  grid-template-columns: 1fr 1fr; align-items: center; gap: 10px;">
+            <select name="start-month" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; ">
+              <option value="">Ay</option>
+              <option value="Ocak">Ocak</option>
+              <option value="Şubat">Şubat</option>
+              <option value="Mart">Mart</option>
+              <option value="Nisan">Nisan</option>
+              <option value="Mayıs">Mayıs</option>
+              <option value="Haziran">Haziran</option>
+              <option value="Temmuz">Temmuz</option>
+              <option value="Ağustos">Ağustos</option>
+              <option value="Eylül">Eylül</option>
+              <option value="Ekim">Ekim</option>
+              <option value="Kasım">Kasım</option>
+              <option value="Aralık">Aralık</option>
+            </select>
 
-          <label style="font-weight: bold; margin-left: 10px;">Başlangıç Yılı:</label>
-          <select name="start-year" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></select>
+            <select name="start-year" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></select>
+          </div>
         </div>
 
         <!-- End Date -->
         <div style="margin-top: 10px;">
-          <label style="font-weight: bold;">Bitiş Ayı:</label>
-          <select name="end-month" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-            <option value="">Ay</option>
-            <option value="Ocak">Ocak</option>
-            <option value="Şubat">Şubat</option>
-            <option value="Mart">Mart</option>
-            <option value="Nisan">Nisan</option>
-            <option value="Mayıs">Mayıs</option>
-            <option value="Haziran">Haziran</option>
-            <option value="Temmuz">Temmuz</option>
-            <option value="Ağustos">Ağustos</option>
-            <option value="Eylül">Eylül</option>
-            <option value="Ekim">Ekim</option>
-            <option value="Kasım">Kasım</option>
-            <option value="Aralık">Aralık</option>
-          </select>
+          <label style="font-weight: 500; font-size:0.9em;">Bitiş Tarihi</label>
+          <div style="display: grid;  grid-template-columns: 1fr 1fr; align-items: center; gap: 10px;">
+            <select name="end-month" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+              <option value="">Ay</option>
+              <option value="Ocak">Ocak</option>
+              <option value="Şubat">Şubat</option>
+              <option value="Mart">Mart</option>
+              <option value="Nisan">Nisan</option>
+              <option value="Mayıs">Mayıs</option>
+              <option value="Haziran">Haziran</option>
+              <option value="Temmuz">Temmuz</option>
+              <option value="Ağustos">Ağustos</option>
+              <option value="Eylül">Eylül</option>
+              <option value="Ekim">Ekim</option>
+              <option value="Kasım">Kasım</option>
+              <option value="Aralık">Aralık</option>
+            </select>
 
-          <label style="font-weight: bold; margin-left: 10px;">Bitiş Yılı:</label>
-          <select name="end-year" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></select>
+            <select name="end-year" required style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></select>
+          </div>
         </div> `;
 
       document.body.innerHTML = appHTML;
@@ -235,7 +249,7 @@
 
         educationDiv.innerHTML = /* HTML */ `
           <div>
-            <label style="font-weight: bold;">Derece:</label>
+            <label style="font-weight: 500; font-size:0.9em;">Derece</label>
             <input
               type="text"
               name="degree"
@@ -246,7 +260,7 @@
           </div>
 
           <div style="margin-top: 10px;">
-            <label style="font-weight: bold;">Okul:</label>
+            <label style="font-weight: 500; font-size:0.9em;">Okul</label>
             <input
               type="text"
               name="school"
@@ -263,7 +277,7 @@
             onclick="removeElement('education-'+${educationCount})"
             style="margin-top: 10px; background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;"
           >
-            Kaldır
+            Eğitimi kaldır
           </button>
         `;
 
@@ -294,7 +308,7 @@
 
         experienceDiv.innerHTML = /* HTML */ `
           <div>
-            <label style="font-weight: bold;">Ünvan:</label>
+            <label style="font-weight: 500; font-size:0.9em;">Ünvan</label>
             <input
               type="text"
               name="jobTitle"
@@ -305,7 +319,7 @@
           </div>
 
           <div style="margin-top: 10px;">
-            <label style="font-weight: bold;">İşveren</label>
+            <label style="font-weight: 500; font-size:0.9em;">İşveren</label>
             <input
               type="text"
               name="company"
@@ -318,13 +332,12 @@
           ${detailsHtml}
 
           <div style="margin-top: 10px;">
-            <label style="font-weight: bold;">Açıklama:</label>
-            <input
-              type="text"
+            <label style="font-weight: 500; font-size:0.9em;">Açıklama</label>
+            <textarea
               name="description"
               required
-              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
-            />
+              style="width: 100%; max-width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            ></textarea>
           </div>
 
           <button
@@ -332,7 +345,7 @@
             onclick="removeElement('experience-'+${experienceCount})"
             style="margin-top: 10px; background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;"
           >
-            Kaldır
+            Deneyimi kaldır
           </button>
         `;
 
@@ -350,7 +363,7 @@
 
         certificateDiv.innerHTML = /* HTML */ `
           <div>
-            <label style="font-weight: bold;">Sertifika adı:</label>
+            <label style="font-weight: 500; font-size:0.9em;">Sertifika adı</label>
             <input
               type="text"
               name="certificateName"
@@ -361,7 +374,7 @@
           </div>
 
           <div style="margin-top: 10px;">
-            <label style="font-weight: bold;">Kurum:</label>
+            <label style="font-weight: 500; font-size:0.9em;">Kurum</label>
             <input
               type="text"
               name="institution"
@@ -374,13 +387,12 @@
           ${detailsHtml}
 
           <div style="margin-top: 10px;">
-            <label style="font-weight: bold;">Açıklama:</label>
-            <input
-              type="text"
+            <label style="font-weight: 500; font-size:0.9em;">Açıklama</label>
+            <textarea
               name="description"
               required
-              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
-            />
+              style="width: 100%; max-width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+            ></textarea>
           </div>
 
           <button
@@ -388,7 +400,7 @@
             onclick="removeElement('certificate-'+${certificateCount})"
             style="margin-top: 10px; background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;"
           >
-            Kaldır
+            Sertifikayı kaldır
           </button>
         `;
 
@@ -406,7 +418,7 @@
 
         referenceDiv.innerHTML = /* HTML */ `
           <div>
-            <label style="font-weight: bold;">Şirket adı:</label>
+            <label style="font-weight: 500; font-size:0.9em;">Şirket adı</label>
             <input
               type="text"
               name="referenceCompany"
@@ -417,7 +429,7 @@
           </div>
 
           <div style="margin-top: 10px;">
-            <label style="font-weight: bold;">İletişim kişisi:</label>
+            <label style="font-weight: 500; font-size:0.9em;">İletişim kişisi</label>
             <input
               type="text"
               name="referencePerson"
@@ -428,7 +440,7 @@
           </div>
 
           <div style="margin-top: 10px;">
-            <label for="phone" style="font-weight: bold;">Telefon Numarası:</label>
+            <label for="phone" style="font-weight: 500; font-size:0.9em;">Telefon Numarası</label>
             <input
               type="tel"
               name="referencePhone"
@@ -438,7 +450,7 @@
           </div>
 
           <div style="margin-top: 10px;">
-            <label for="email" style="font-weight: bold;">E-posta adresi:</label>
+            <label for="email" style="font-weight: 500; font-size:0.9em;">E-posta adresi</label>
             <input type="email" name="referenceEmail" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" />
           </div>
 
@@ -447,7 +459,7 @@
             onclick="removeElement('reference-'+${referenceCount})"
             style="margin-top: 10px; background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;"
           >
-            Kaldır
+            Referansı kaldır
           </button>
         `;
 
